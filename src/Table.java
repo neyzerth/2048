@@ -4,6 +4,7 @@ public class Table {
     private Square [][] rows = new Square[4][4];
 
     public Table(){
+        //generate 2 random squares
         randomSquare();
         randomSquare();
     }
@@ -12,15 +13,13 @@ public class Table {
         Random rd = new Random();
         boolean empty;
         do {
-            int r1 = rd.nextInt(4);
-            int r2 = rd.nextInt(4);
-            empty = this.rows[r1][r2] == null;
+            int i = rd.nextInt(4);
+            int j = rd.nextInt(4);
+            empty = this.rows[i][j] == null;
 
-            if(!empty)
-                continue;
+            if(!empty) continue; //iterate again if isn't empty
             
-            this.rows[r1][r2] = new Square();
-            this.rows[r1][r2].setIterator(1);;
+            this.rows[i][j] = new Square();
         } while(!empty);
     }
 
@@ -57,8 +56,8 @@ public class Table {
 
     private String numFormat(int number){
         int numLong = String.valueOf(number).length();
-        int second = 5 - numLong;
         int first = numLong > 2 ? 2 : 3;
+        int second = 5 - numLong;
         String row = "|"+ Text.spacing(first) + number + Text.spacing(second) + "|";
 
 
