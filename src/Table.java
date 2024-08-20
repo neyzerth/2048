@@ -27,6 +27,10 @@ public class Table {
         this.best = new Player(best[1], Integer.parseInt(best[0]));
         biggestValue = 0;
     }
+    public Table(Player p){
+        this();
+        this.p = p;
+    }
     
     // Constructor if you want to start with specific positions
     public Table(int... pos){
@@ -92,12 +96,16 @@ public class Table {
             }
 
         }
-        if(best == p){
+        if(best == p && p.getName().equals("You")){
             System.out.println();
             System.out.println("New Best Score: " + best.score.points());
             System.out.print("Write your name: ");
+            
             p.setName(scan.nextLine().replace(" ",""));
+            
             Score.newBestScore(p);
+        }else if(!p.getName().equals("You")){
+            Score.newScore(p);
         }
 
     }
@@ -303,7 +311,6 @@ public class Table {
     private void bestScore(){
         if(p.score.points() > best.score.getBestScore()){
             best = p;
-            Score.newBestScore(p);
         }
     }
 

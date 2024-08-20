@@ -13,7 +13,8 @@ public class App {
 
             System.out.println("Choose an option:");
             String [] menu = {
-                Color.green("Play"),
+                Color.green("Play")//,
+                //Color.cyan("Save your score"),
             };
             for (int i = 0; i < menu.length; i++) {
                 System.out.println((i+1) +". " + menu[i]);
@@ -26,6 +27,12 @@ public class App {
                 case "1":
                     Table test = new Table();
                     test.play();
+                    break;
+
+                case "2":
+                    System.out.print("Write your name: ");
+                
+                    player = new Player(scan.nextLine().replace(" ",""));
                     break;
             
                 default:

@@ -1,11 +1,13 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.io.IOException;
 
 public class Score {
     private int points;
     private int bestScore;
+    private static String route = "Player/scores.txt"; // Ruta del archivo
     
     public Score(){
         this.points = 0;
@@ -35,7 +37,15 @@ public class Score {
     }
 
     public static void newBestScore(Player p){
-        try (PrintWriter writer = new PrintWriter("Player/scores.txt")) {
+        try (PrintWriter writer = new PrintWriter(Score.route)) {
+            writer.println(p.score.getBestScore() + " " + p.getName());
+        } catch (IOException e) {
+            System.out.println("File not found");
+        }
+    }
+
+    public static void newScore(Player p){
+        try (PrintWriter writer = new PrintWriter(new FileWriter(Score.route, true))) {
             writer.println(p.score.getBestScore() + " " + p.getName());
         } catch (IOException e) {
             System.out.println("File not found");
@@ -44,7 +54,6 @@ public class Score {
 
     public static String [] allBestScore(){
         
-            String route = "Player/scores.txt"; // Ruta del archivo
             String [] scoreData = new String[2];
     
             try (BufferedReader reader = new BufferedReader(new FileReader(route))) {
