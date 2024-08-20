@@ -47,8 +47,10 @@ public class Table {
             rows[x][y] = new Square();
         }
         
-        this.p.score = new Score();
-        this.biggestValue = 0;
+        String[] best = Score.allBestScore();
+        this.p = new Player();
+        this.best = new Player(best[1], Integer.parseInt(best[0]));
+        biggestValue = 0;
     }
     
     @SuppressWarnings("resource")
@@ -92,6 +94,7 @@ public class Table {
         }
         if(best == p){
             System.out.println();
+            System.out.println("New Best Score: " + best.score.points());
             System.out.print("Write your name: ");
             p.setName(scan.nextLine().replace(" ",""));
             Score.newBestScore(p);
