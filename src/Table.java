@@ -194,6 +194,7 @@ public class Table {
         // Use the absolute value if negative to avoid errors in array positions
 
         int last = first + 4;
+        int lastMerged = -5;
 
         for (int i = first; i < last; i++) {
             // Save the current square
@@ -211,9 +212,12 @@ public class Table {
             // Make the previous position null
             row[Math.abs(i)] = null;
 
+            boolean wasMerged = k != lastMerged+1;
+
             // If not at the last position, try to merge with the next square
+            // If the next square has been merged, it cannot be merged again.
             // If the merge is unsuccessful, only update the new position
-            if(!(k > first) || !sq.merge(row[Math.abs(k-1)])){
+            if(!(k > first) || !(wasMerged && sq.merge(row[Math.abs(k-1)]))){
                 row[Math.abs(k)] = sq;
                 continue;
             }
@@ -222,7 +226,7 @@ public class Table {
             // and move the square to the next position
             row[Math.abs(k)] = null;
             row[Math.abs(k-1)] = sq;
-            
+            lastMerged = k-1;
             setBiggestValue(sq.getIterator());
             this.p.score.addScore(sq.getValue());
             bestScore();
