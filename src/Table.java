@@ -3,15 +3,31 @@ import java.util.Scanner;
 
 public class Table {
     private Square [][] rows = new Square[4][4];
-    public static int score;
+    public int biggestValue;
+    public Player p;
+    public Player best;
+
+    public static String logo =
+        Color.blue( Color.bold(
+            "\t ___   ___  _  _   ___  \n" + //
+            "\t|__ \\ / _ \\| || | / _ \\ \n" + //
+            "\t   ) | | | | || || (_) |\n" + //
+            "\t  / /| | | |__   _> _ < \n" + //
+            "\t / /_| |_| |  | || (_) |\n" + //
+            "\t|____|\\___/   |_| \\___/\n "
+        )
+    );
 
     public Table(){
         // Generate 2 random squares
         randomSquare();
         randomSquare();
-        Table.score = 0;
+        String[] best = Score.allBestScore();
+        this.p = new Player();
+        this.best = new Player(best[1], Integer.parseInt(best[0]));
+        biggestValue = 0;
     }
-
+    
     // Constructor if you want to start with specific positions
     public Table(int... pos){
         int x,y;
@@ -25,36 +41,62 @@ public class Table {
                 i <= 8 ? 1 : 
                 i <= 12 ? 2 : 
                 i <= 16 ? 3 : -1;
-                
+            
             y = i - (x * 4) - 1;
-
+            
             rows[x][y] = new Square();
         }
-
-        Table.score = 0;
+        
+        this.p.score = new Score();
+        this.biggestValue = 0;
     }
     
     @SuppressWarnings("resource")
     public void play(){
+        Scanner scan = new Scanner(System.in);
+
         while (true) {
-            Scanner move = new Scanner(System.in);
             Text.clear();
-            System.out.println(
-                Color.blue( Color.bold(
-                "\t ___   ___  _  _   ___  \n" + //
-                "\t|__ \\ / _ \\| || | / _ \\ \n" + //
-                "\t   ) | | | | || || (_) |\n" + //
-                "\t  / /| | | |__   _> _ < \n" + //
-                "\t / /_| |_| |  | || (_) |\n" + //
-                "\t|____|\\___/   |_| \\___/\n "
-                ))
-            );
-            System.out.println(Color.bold("Score : " + Color.green(Table.score+"\n")));
+            System.out.println(Table.logo);
+            System.out.println(Color.bold("Score : " + Color.green(p.score.points()+"")));
+            System.out.println(Color.bold("Best Score : " + Color.green(best.score.getBestScore()+" ")) + Color.cyan("("+best.getName()+")"));
+            System.out.println();
 
             print();
+            System.out.print(Color.red(Color.bold("\n[Q] Quit: ")));
             System.out.print(Color.cyan(Color.bold("\n←[A] ↑[W] →[D] ↓[S]: ")));
-            chooseMove(move.next().toLowerCase().charAt(0));
+
+            char opt = 0;
+            try {
+                opt = scan.nextLine().toLowerCase().charAt(0);
+            } catch (Exception e) {}
+            chooseMove(opt);
+
+            if(opt  == 'q'){
+                Text.clear();
+                System.out.print (
+                    Color.red(
+                    "\nAre you sure you want to quit the game?")+
+                        Color.bold("\nYES[y] NO[ANOTHER KEY]: "
+                    )
+                );
+
+                if(scan.nextLine().toLowerCase().equals("y")) break;
+            }
+            
+            if(this.biggestValue == 10){
+                winnerScreen();
+                break;
+            }
+
         }
+        if(best == p){
+            System.out.println();
+            System.out.print("Write your name: ");
+            p.setName(scan.nextLine().replace(" ",""));
+            Score.newBestScore(p);
+        }
+
     }
     public void randomSquare(){
         Random rd = new Random();
@@ -121,10 +163,27 @@ public class Table {
                     break;
             }
         }
-
         // Only spawn a random square if a different move was made
         if(!compareTable(old)) 
             randomSquare();
+        
+    }
+
+    public void winnerScreen(){
+        Text.clear();
+        System.out.println(
+            Color.green(Color.bold(
+            "__          _______ _   _ _   _ ______ _____  _ _ \n" + //
+            "\\ \\        / /_   _| \\ | | \\ | |  ____|  __ \\| | |\n" + //
+            " \\ \\  /\\  / /  | | |  \\| |  \\| | |__  | |__) | | |\n" + //
+            "  \\ \\/  \\/ /   | | | . ` | . ` |  __| |  _  /| | |\n" + //
+            "   \\  /\\  /   _| |_| |\\  | |\\  | |____| | \\ \\|_|_|\n" + //
+            "    \\/  \\/   |_____|_| \\_|_| \\_|______|_|  \\_(_|_)"
+            ))
+        );
+
+        print();
+        Text.waitEnter();
     }
 
     public Square [] move(Square [] row, int first){
@@ -160,6 +219,11 @@ public class Table {
             // and move the square to the next position
             row[Math.abs(k)] = null;
             row[Math.abs(k-1)] = sq;
+            
+            setBiggestValue(sq.getIterator());
+            this.p.score.addScore(sq.getValue());
+            bestScore();
+
         }
 
         return row;
@@ -224,4 +288,16 @@ public class Table {
 
         return row;
     }
+
+    private void setBiggestValue(int value){
+        this.biggestValue = Math.max(value, biggestValue);
+    }
+
+    private void bestScore(){
+        if(p.score.points() > best.score.getBestScore()){
+            best = p;
+            Score.newBestScore(p);
+        }
+    }
+
 }

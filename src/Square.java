@@ -17,7 +17,6 @@ public class Square {
 
         
         this.iterator++;
-        Table.score += getValue();
         this.defColor();
 
         //"kill" the second square merged
