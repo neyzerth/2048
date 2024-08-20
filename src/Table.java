@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.Random;
 
 public class Table {
@@ -70,48 +69,97 @@ public class Table {
 
     }
 
-    public void moveRight(){
+    public void chooseMove(char letter){
         Square [][] temp = new Square[4][4];
         for (int i = 0; i < 4; i++) 
             for (int j = 0; j < 4; j++)
                 temp[i][j] = this.rows[i][j]; 
-
+        
         for (int i = 0; i < 4; i++) {
-            Square [] row = rows[i];
-
-            for (int j = 3; j >= 0; j--) {
-                //guarda el cuadro iterado
-                Square sq = row[j];
-
-                //si es null, no hace nada
-                if(sq == null) continue;
-
-    
-                int k = j; //contador para recorrer los cuadros a su derecha
-                //recorre hasta llegar a un cuadro no vacio
-                while((k) < 3 && row[k+1] == null)
-                    k++;
-
+                switch (letter) {
+                    case 'a': moveLeft(i);
+                        break;
+                    case 'w': moveUp(i);
+                        break;
+                    case 'd': moveRight(i);
+                        break;
+                    case 's': moveDown(i);
+                        break;
                 
-                //deja vacio la posicion anterior
-                row[j] = null;
-
-                //si no esta en la ultima posicion, intenta combinarse con el siguiente
-            
-                if(!(k < 3) || !sq.merge(row[k+1])){
-                    row[k] = sq;
-                    continue;
+                    default:
+                        break;
                 }
-                row[k] = null;
-                row[k+1] = sq;
-            
-                                
-            }
-
         }
+
         if(!compareTable(temp)) 
-            randomSquare();
+        randomSquare();
+
     }
+
+    public Square [] move(Square [] row, int first){
+        int last = first + 4;
+
+        for (int i = first; i < last; i++) {
+            //guarda el cuadro iterado
+            Square sq = row[Math.abs(i)];
+
+            //si es null, no hace nada
+            if(sq == null) continue;
+
+
+            int k = i; //contador para recorrer los cuadros a su derecha
+            //recorre hasta llegar a un cuadro no vacio
+            while(k > first && row[Math.abs(k-1)] == null)
+                k--;
+
+            
+            //deja vacio la posicion anterior
+            row[Math.abs(i)] = null;
+
+            //si no esta en la ultima posicion, intenta combinarse con el siguiente
+        
+            if(!(k > first) || !sq.merge(row[Math.abs(k-1)])){
+                row[Math.abs(k)] = sq;
+                continue;
+            }
+            row[Math.abs(k)] = null;
+            row[Math.abs(k-1)] = sq;
+        }
+        return row;
+
+    }
+
+    public void moveRight(int i){
+        Square [] row = this.rows[i];
+        move(row,-3);
+    }
+    
+    public void moveLeft(int i){
+        Square [] row = this.rows[i];
+        move(row, 0);
+    }
+
+    public void moveUp(int i){
+        Square [] row = new Square[4];
+        for (int j = 0; j < row.length; j++) 
+            row[j] = this.rows[j][i];
+        Square [] newColum = move(row,0);
+
+        for (int j = 0; j < row.length; j++)
+            this.rows[j][i] = newColum[j];
+    }
+    
+    public void moveDown(int i){
+        Square [] row = new Square[4];
+        for (int j = 0; j < row.length; j++) 
+            row[j] = this.rows[j][i];
+    
+        Square [] newColum = move(row,-3);
+        
+        for (int j = 0; j < row.length; j++)
+            this.rows[j][i] = newColum[j];
+    }
+    
 
     private boolean compareTable(Square[][] table){
         for (int i = 0; i < 4; i++) 
@@ -123,48 +171,8 @@ public class Table {
         return true;
     }
 
-    public void moveLeft(){
-        Square [][] temp = new Square[4][4];
-        for (int i = 0; i < 4; i++) 
-            for (int j = 0; j < 4; j++)
-                temp[i][j] = this.rows[i][j]; 
-
-        for (int i = 0; i < 4; i++) {
-            Square [] newRow = new Square[4];
-
-            newRow = rows[i];
-            for (int j = 0; j < 4; j++) {
-                //guarda el cuadro iterado
-                Square sq = rows[i][j];
-
-                //si es null, no hace nada
-                if(sq == null) continue;
 
     
-                int k = j; //contador para recorrer los cuadros a su derecha
-                //recorre hasta llegar a un cuadro no vacio
-                while((k) > 0 && rows[i][k-1] == null)
-                    k--;
-
-                //deja vacio la posicion anterior
-                newRow[j] = null;
-
-                //si no esta en la ultima posicion, intenta combinarse con el siguiente
-                if((k) > 0 && sq.merge(newRow[k-1])){
-                    newRow[k] = null;
-                    newRow[k-1] = sq;
-                } else {
-                    newRow[k] = sq;
-                }
-                                
-                rows[i] = newRow;
-            }
-
-        }
-        if(!Arrays.equals(this.rows, temp)) 
-            randomSquare();
-
-    }
 
     
 
