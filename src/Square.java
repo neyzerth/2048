@@ -5,17 +5,19 @@ public class Square {
 
     public Square(){
         //initialize the square (value is 2)
-        this.iterator = 1;
+        this.iterator = 0;
         this.defColor();
     }
 
+
     public boolean merge(Square sq){
-        //validate if is the same value
+        //validate if its the same value
         if (sq == null || this.iterator != sq.iterator)
             return false;
 
         
         this.iterator++;
+        Table.score += getValue();
         this.defColor();
 
         //"kill" the second square merged
@@ -24,9 +26,8 @@ public class Square {
     }
 
     private void defColor(){
-        //the 11 colors that  can be used
+        //the 10 colors that  can be used
         String [] color = {
-            "",
             Color.greenBackground,
             Color.blueBackground,
             Color.redBackground,
@@ -54,7 +55,7 @@ public class Square {
     public int getValue(){
         // 2, 4, 8, 16, 32, 64... 2048
         // 1, 2, 3, 4,  5,  6 ... 11
-        return (int) Math.pow(2, iterator);
+        return (int) Math.pow(2, iterator+1);
     }
 
     public void  setIterator(int iterator){
