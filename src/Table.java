@@ -59,6 +59,8 @@ public class Table {
         this.best = new Player(best[1], Integer.parseInt(best[0]));
         biggestValue = 0;
     }
+
+// ------------- MENUS --------
     
     @SuppressWarnings("resource")
     public void play(){
@@ -104,35 +106,6 @@ public class Table {
 
     }
 
-    @SuppressWarnings("resource")
-    public void exitMenu(){
-        Scanner scan = new Scanner(System.in);
-        if(best == p && p.getName().equals("You")){
-            System.out.println();
-            System.out.println("New Best Score: " + best.score.points());
-            System.out.print("Write your name: ");
-            
-            p.setName(scan.nextLine().replace(" ",""));
-            
-            Score.newBestScore(p);
-        }else if(!p.getName().equals("You")){
-            Score.newScore(p);
-        }
-    }
-    public void randomSquare(){
-        Random rd = new Random();
-        boolean empty;
-        do {
-            int i = rd.nextInt(4);
-            int j = rd.nextInt(4);
-            empty = this.rows[i][j] == null;
-            
-            if(!empty) continue; // Iterate again if the square isn't empty
-            
-            this.rows[i][j] = new Square();
-        } while(!empty);
-    }
-
     public void print(){
         String[] squareLn = {
             "+--------+",
@@ -165,63 +138,20 @@ public class Table {
         }
     }
 
-
-    public void turn(char letter){
-        // Save the previous move
-        Square [][] old = new Square[4][4];
-        for (int i = 0; i < 4; i++) 
-            for (int j = 0; j < 4; j++)
-                old[i][j] = this.rows[i][j]; 
-
-        move(letter);
-
-        // Only spawn a random square if a different move was made
-        if(!compareTable(old)) randomSquare();
-        else if(tableFull()){ //if the table was the same, check if the table is full
-            canMove();
-        }       
-    }
-
-    public void move(char letter){
-        for (int i = 0; i < 4; i++) { // For each row
-            switch (letter) {
-                case 'a': moveLeft(i);
-                    break;
-                case 'w': moveUp(i);
-                    break;
-                case 'd': moveRight(i);
-                    break;
-                case 's': moveDown(i);
-                    break;
-            }
+    @SuppressWarnings("resource")
+    public void exitMenu(){
+        Scanner scan = new Scanner(System.in);
+        if(best == p && p.getName().equals("You")){
+            System.out.println();
+            System.out.println("New Best Score: " + best.score.points());
+            System.out.print("Write your name: ");
+            
+            p.setName(scan.nextLine().replace(" ",""));
+            
+            Score.newBestScore(p);
+        }else if(!p.getName().equals("You")){
+            Score.newScore(p);
         }
-    }
-
-    private void canMove(){
-        Square [][] save = new Square[4][4];
-            for (int i = 0; i < 4; i++) 
-                for (int j = 0; j < 4; j++)
-                    save[i][j] = new Square(this.rows[i][j]); 
-
-            //make sure can make another move
-            move('a');
-            move('w');
-            move('d');
-            move('s');
-            print();
-
-            //if the table still same, game over
-            if(compareTable(save)){
-                //this.rows = old;
-                System.out.println(Color.red("\nGame Over"));
-                this.gameOver = true;
-                return;
-            }
-
-            //if isn't the same, reload the old table
-            for (int i = 0; i < 4; i++) 
-                for (int j = 0; j < 4; j++)
-                    this.rows[i][j] = new Square(save[i][j]);
     }
 
     public void winnerScreen(){
@@ -241,10 +171,123 @@ public class Table {
         Text.waitEnter();
     }
 
+    // ------------- MOVES --------
+
+    public void randomSquare(){
+        Random rd = new Random();
+        boolean empty;
+        do {
+            int i = rd.nextInt(4);
+            int j = rd.nextInt(4);
+            empty = this.rows[i][j] == null;
+            
+            if(!empty) continue; // Iterate again if the square isn't empty
+            
+            this.rows[i][j] = new Square();
+        } while(!empty);
+    }
+
+    public void turn(char letter){
+        // Save the previous move
+        Square [][] old = new Square[4][4];
+        for (int i = 0; i < 4; i++) 
+            for (int j = 0; j < 4; j++)
+                old[i][j] = this.rows[i][j]; 
+
+        chooseMove(letter);
+
+        // Only spawn a random square if a different move was made
+        if(!compareTable(old)) randomSquare();
+        else if(tableFull()){ //if the table was the same, check if the table is full
+            canMove();
+        }       
+    }
+
+    //Check if the game is over
+    private void canMove(){
+        Square [][] save = new Square[4][4];
+            for (int i = 0; i < 4; i++) 
+                for (int j = 0; j < 4; j++)
+                    save[i][j] = new Square(this.rows[i][j]); 
+
+            //make sure can make another move
+            chooseMove('a');
+            chooseMove('w');
+            chooseMove('d');
+            chooseMove('s');
+            print();
+
+            //if the table still same, game over
+            if(compareTable(save)){
+                //this.rows = old;
+                System.out.println(Color.red("\nGame Over"));
+                this.gameOver = true;
+                return;
+            }
+
+            //if isn't the same, reload the old table
+            for (int i = 0; i < 4; i++) 
+                for (int j = 0; j < 4; j++)
+                    this.rows[i][j] = new Square(save[i][j]);
+    }
+
+    public void chooseMove(char letter){
+        for (int i = 0; i < 4; i++) { // For each row
+            switch (letter) {
+                case 'a': moveLeft(i);
+                    break;
+                case 'w': moveUp(i);
+                    break;
+                case 'd': moveRight(i);
+                    break;
+                case 's': moveDown(i);
+                    break;
+            }
+        }
+    }
+
+    public void moveLeft(int i){
+        Square [] row = this.rows[i];
+        // For moving left, the first position is 0
+        move(row, 0);
+    }
+
+    public void moveRight(int i){
+        Square [] row = this.rows[i];
+        // For moving right, the first position is 3, so we need to
+        // make the first position negative to avoid errors in loops
+        move(row,-3);
+    }
+    
+
+    public void moveUp(int i){
+        Square [] row = new Square[4];
+        // We need to convert the 2D of the
+        // rows array into a 1D array
+        for (int j = 0; j < row.length; j++) 
+            row[j] = this.rows[j][i];
+        Square [] newColumn = move(row,0);
+
+        for (int j = 0; j < row.length; j++)
+            this.rows[j][i] = newColumn[j];
+    }
+    
+    public void moveDown(int i){
+        Square [] row = new Square[4];
+        // We need to convert the 2D of the
+        // rows array into a 1D array
+        for (int j = 0; j < row.length; j++) 
+            row[j] = this.rows[j][i];
+    
+        Square [] newColumn = move(row,-3);
+        
+        for (int j = 0; j < row.length; j++)
+            this.rows[j][i] = newColumn[j];
+    }
+
     public Square [] move(Square [] row, int first){
         // The last position always has a difference of 4
         // Use the absolute value if negative to avoid errors in array positions
-
         int last = first + 4;
         int lastMerged = -5;
 
@@ -288,46 +331,8 @@ public class Table {
         return row;
     }
     
-    public void moveLeft(int i){
-        Square [] row = this.rows[i];
-        // For moving left, the first position is 0
-        move(row, 0);
-    }
 
-    public void moveRight(int i){
-        Square [] row = this.rows[i];
-        // For moving right, the first position is 3, so we need to
-        // make the first position negative to avoid errors in loops
-        move(row,-3);
-    }
-    
-
-    public void moveUp(int i){
-        Square [] row = new Square[4];
-        // We need to convert the second dimension of the
-        // rows array into a 1D array
-        for (int j = 0; j < row.length; j++) 
-            row[j] = this.rows[j][i];
-        Square [] newColumn = move(row,0);
-
-        for (int j = 0; j < row.length; j++)
-            this.rows[j][i] = newColumn[j];
-    }
-    
-    public void moveDown(int i){
-        Square [] row = new Square[4];
-        // We need to convert the second dimension of the
-        // rows array into a 1D array
-        for (int j = 0; j < row.length; j++) 
-            row[j] = this.rows[j][i];
-    
-        Square [] newColumn = move(row,-3);
-        
-        for (int j = 0; j < row.length; j++)
-            this.rows[j][i] = newColumn[j];
-    }
-    
-
+    // --------------- TABLE -------------
     private boolean compareTable(Square[][] table){
         // Compare each value of a 2D array
         // with the corresponding rows of the table
@@ -336,6 +341,15 @@ public class Table {
                 if (table[i][j] != this.rows[i][j])
                     return false;
         
+        return true;
+    }
+    
+    private boolean tableFull(){
+        for (Square[] row : rows) {
+            for (Square square : row) {
+                if(square == null) return false;
+            }
+        }
         return true;
     }
 
@@ -348,24 +362,19 @@ public class Table {
         return row;
     }
 
-    private void setBiggestValue(int value){
-        this.biggestValue = Math.max(value, biggestValue);
-    }
-
+    // ------------- SCORE --------    
     private void bestScore(){
         if(p.score.points() > best.score.getBestScore()){
             best = p;
         }
     }
 
-    private boolean tableFull(){
-        for (Square[] row : rows) {
-            for (Square square : row) {
-                if(square == null) return false;
-            }
-        }
-        return true;
+    private void setBiggestValue(int value){
+        this.biggestValue = Math.max(value, biggestValue);
     }
+
+
+    //SETTERS AND GETTERS
 
     public void setRow(int i, int j, int iterator){
         Square sq = this.rows[i][j];
