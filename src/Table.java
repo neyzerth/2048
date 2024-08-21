@@ -33,6 +33,10 @@ public class Table {
         this();
         this.p = p;
     }
+    public Table(Square [][] rows){
+        this();
+        this.rows = rows;
+    }
     
     // Constructor if you want to start with specific positions
     public Table(int... pos){
@@ -75,7 +79,8 @@ public class Table {
 
             print();
             System.out.print(Color.red(Color.bold("\n[Q] Quit: ")));
-            System.out.print(Color.cyan(Color.bold("\n←[A] ↑[W] →[D] ↓[S]: ")));
+            System.out.print(Color.cyan(Color.bold("\n    ^ W ")));
+            System.out.print(Color.cyan(Color.bold("\n< A v S D >: ")));
 
             char opt = 0;
             try {
@@ -206,29 +211,27 @@ public class Table {
     //Check if the game is over
     private void canMove(){
         Square [][] save = new Square[4][4];
-            for (int i = 0; i < 4; i++) 
+        for (int i = 0; i < 4; i++) 
                 for (int j = 0; j < 4; j++)
-                    save[i][j] = new Square(this.rows[i][j]); 
+                    save[i][j] = new Square(this.rows[i][j]);
+        
+        Table temp = new Table(save);
 
-            //make sure can make another move
-            chooseMove('a');
-            chooseMove('w');
-            chooseMove('d');
-            chooseMove('s');
-            print();
+        //make sure can make another move
+        temp.chooseMove('a');
+        temp.chooseMove('w');
+        temp.chooseMove('d');
+        temp.chooseMove('s');
+        //print();
 
-            //if the table still same, game over
-            if(compareTable(save)){
-                //this.rows = old;
-                System.out.println(Color.red("\nGame Over"));
-                this.gameOver = true;
-                return;
-            }
+        //if the table still same, game over
+        if(compareTable(temp.rows)){
+            //this.rows = old;
+            System.out.println(Color.red("\nGame Over"));
+            this.gameOver = true;
+            return;
+        }
 
-            //if isn't the same, reload the old table
-            for (int i = 0; i < 4; i++) 
-                for (int j = 0; j < 4; j++)
-                    this.rows[i][j] = new Square(save[i][j]);
     }
 
     public void chooseMove(char letter){
@@ -337,9 +340,12 @@ public class Table {
         // Compare each value of a 2D array
         // with the corresponding rows of the table
         for (int i = 0; i < 4; i++) 
-            for (int j = 0; j < 4; j++) 
-                if (table[i][j] != this.rows[i][j])
-                    return false;
+            for (int j = 0; j < 4; j++){
+                int a = table[i][j] != null ? table[i][j].getIterator() : -1;
+                int b = this.rows[i][j] != null ? this.rows[i][j].getIterator() : -1;
+                
+                if (a != b) return false;
+            }
         
         return true;
     }
