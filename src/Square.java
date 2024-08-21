@@ -1,14 +1,32 @@
+import java.util.Random;
+
 public class Square {
     private String color;
     //the times merged
     private int iterator;
 
     public Square(){
+        Random rd = new Random();
+        //2% chance that the square is initialized with 4(1) instead of 2(0)
+        int probability = rd.nextInt(100);
+        int value = probability < 2 ? 1 : 0;
+
+        this.iterator = value;
+        defColor();
+    }
+
+    public Square(int iterator){
         //initialize the square (value is 2)
-        this.iterator = 0;
+        this.iterator = iterator;
         this.defColor();
     }
 
+    public Square(Square sq){
+        if(sq == null) return; 
+        
+        this.iterator = sq.getIterator();
+        this.defColor();
+    }
 
     public boolean merge(Square sq){
         //validate if its the same value

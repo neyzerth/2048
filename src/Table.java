@@ -3,9 +3,10 @@ import java.util.Scanner;
 
 public class Table {
     private Square [][] rows = new Square[4][4];
-    public int biggestValue;
+    private int biggestValue;
     public Player p;
     public Player best;
+    private boolean gameOver;
 
     public static String logo =
         Color.blue( Color.bold(
@@ -25,7 +26,8 @@ public class Table {
         String[] best = Score.allBestScore();
         this.p = new Player();
         this.best = new Player(best[1], Integer.parseInt(best[0]));
-        biggestValue = 0;
+        this.biggestValue = 0;
+        this.gameOver = false;
     }
     public Table(Player p){
         this();
@@ -34,6 +36,7 @@ public class Table {
     
     // Constructor if you want to start with specific positions
     public Table(int... pos){
+        this();
         int x,y;
         // Positions: 
         // 1  2  3  4 
@@ -76,7 +79,7 @@ public class Table {
             try {
                 opt = scan.nextLine().toLowerCase().charAt(0);
             } catch (Exception e) {}
-            chooseMove(opt);
+            turn(opt);
 
             if(opt  == 'q'){
                 Text.clear();
@@ -89,13 +92,21 @@ public class Table {
 
                 if(scan.nextLine().toLowerCase().equals("y")) break;
             }
+            if(gameOver) break;
             
             if(this.biggestValue == 10){
                 winnerScreen();
                 break;
             }
+            exitMenu();
 
         }
+
+    }
+
+    @SuppressWarnings("resource")
+    public void exitMenu(){
+        Scanner scan = new Scanner(System.in);
         if(best == p && p.getName().equals("You")){
             System.out.println();
             System.out.println("New Best Score: " + best.score.points());
@@ -107,7 +118,6 @@ public class Table {
         }else if(!p.getName().equals("You")){
             Score.newScore(p);
         }
-
     }
     public void randomSquare(){
         Random rd = new Random();
@@ -116,7 +126,7 @@ public class Table {
             int i = rd.nextInt(4);
             int j = rd.nextInt(4);
             empty = this.rows[i][j] == null;
-
+            
             if(!empty) continue; // Iterate again if the square isn't empty
             
             this.rows[i][j] = new Square();
@@ -155,13 +165,24 @@ public class Table {
         }
     }
 
-    public void chooseMove(char letter){
+
+    public void turn(char letter){
         // Save the previous move
         Square [][] old = new Square[4][4];
         for (int i = 0; i < 4; i++) 
             for (int j = 0; j < 4; j++)
                 old[i][j] = this.rows[i][j]; 
-        
+
+        move(letter);
+
+        // Only spawn a random square if a different move was made
+        if(!compareTable(old)) randomSquare();
+        else if(tableFull()){ //if the table was the same, check if the table is full
+            canMove();
+        }       
+    }
+
+    public void move(char letter){
         for (int i = 0; i < 4; i++) { // For each row
             switch (letter) {
                 case 'a': moveLeft(i);
@@ -174,10 +195,33 @@ public class Table {
                     break;
             }
         }
-        // Only spawn a random square if a different move was made
-        if(!compareTable(old)) 
-            randomSquare();
-        
+    }
+
+    private void canMove(){
+        Square [][] save = new Square[4][4];
+            for (int i = 0; i < 4; i++) 
+                for (int j = 0; j < 4; j++)
+                    save[i][j] = new Square(this.rows[i][j]); 
+
+            //make sure can make another move
+            move('a');
+            move('w');
+            move('d');
+            move('s');
+            print();
+
+            //if the table still same, game over
+            if(compareTable(save)){
+                //this.rows = old;
+                System.out.println(Color.red("\nGame Over"));
+                this.gameOver = true;
+                return;
+            }
+
+            //if isn't the same, reload the old table
+            for (int i = 0; i < 4; i++) 
+                for (int j = 0; j < 4; j++)
+                    this.rows[i][j] = new Square(save[i][j]);
     }
 
     public void winnerScreen(){
@@ -312,6 +356,22 @@ public class Table {
         if(p.score.points() > best.score.getBestScore()){
             best = p;
         }
+    }
+
+    private boolean tableFull(){
+        for (Square[] row : rows) {
+            for (Square square : row) {
+                if(square == null) return false;
+            }
+        }
+        return true;
+    }
+
+    public void setRow(int i, int j, int iterator){
+        Square sq = this.rows[i][j];
+        this.rows[i][j] = sq == null?  new Square(iterator) : sq;
+
+        this.rows[i][j].setIterator(iterator);
     }
 
 }
