@@ -101,10 +101,6 @@ public class Table {
             }
             if(gameOver) break;
             
-            if(this.biggestValue == 10){
-                winnerScreen();
-                break;
-            }
             exitMenu();
 
         }
@@ -168,7 +164,7 @@ public class Table {
             " \\ \\  /\\  / /  | | |  \\| |  \\| | |__  | |__) | | |\n" + //
             "  \\ \\/  \\/ /   | | | . ` | . ` |  __| |  _  /| | |\n" + //
             "   \\  /\\  /   _| |_| |\\  | |\\  | |____| | \\ \\|_|_|\n" + //
-            "    \\/  \\/   |_____|_| \\_|_| \\_|______|_|  \\_(_|_)"
+            "    \\/  \\/   |_____|_| \\_|_| \\_|______|_|  \\_(_|_)\n"
             ))
         );
 
@@ -200,6 +196,11 @@ public class Table {
                 old[i][j] = this.rows[i][j]; 
 
         chooseMove(letter);
+        
+        if(this.biggestValue == 10){
+            winnerScreen();
+            return;
+        }
 
         // Only spawn a random square if a different move was made
         if(!compareTable(old)) randomSquare();
@@ -359,10 +360,14 @@ public class Table {
         return true;
     }
 
+    //1 -> 3 , 4
+    //2 -> 3, 3
+    //3 -> 2, 3
+    //4 -> 1, 3
     private String numFormat(int number){
         int numLen = String.valueOf(number).length();
-        int first = numLen > 3 ? 2 : 3;
-        int second = 5 - numLen;
+        int first = numLen < 3 ? 3 : 2;
+        int second = 8 - first - numLen;
         String row = "|"+ Text.spacing(first) + number + Text.spacing(second) + "|";
 
         return row;
