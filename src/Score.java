@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.PrintWriter;
@@ -7,7 +8,7 @@ import java.io.IOException;
 public class Score {
     private int points;
     private int bestScore;
-    private static String route = "Player/scores.txt"; // Ruta del archivo
+    private static String route = "scores.txt"; // Ruta del archivo
     
     public Score(){
         this.points = 0;
@@ -52,24 +53,28 @@ public class Score {
         }
     }
 
-    public static String [] allBestScore(){
-        
-            String [] scoreData = new String[2];
-    
-            try (BufferedReader reader = new BufferedReader(new FileReader(route))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    scoreData = line.split(" ");                    
-                }
+
+    public static String[] allBestScore() {
+        String[] scoreData = new String[2];
+
+        File file = new File(route);
+        if (!file.exists()) {
+            try (PrintWriter writer = new PrintWriter(file)) {
+                writer.println("0 -");
             } catch (IOException e) {
-                try (PrintWriter writer = new PrintWriter(route)) {
-                    writer.println("0 -");
-                    scoreData = new String[] {"0", "-"};
-                } catch (IOException ex) {
-                    System.out.println("Error");
-                }
+                System.out.println("Error al crear el archivo");
             }
-    
+        }
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                scoreData = line.split(" ");
+            }
+        } catch (IOException e) {
+            System.out.println("Error al leer el archivo");
+        }
+
         return scoreData;
     }
     
