@@ -97,11 +97,16 @@ public class Table {
                     )
                 );
 
-                if(scan.nextLine().toLowerCase().equals("y")) break;
+                if(scan.nextLine().toLowerCase().equals("y"))
+                    this.gameOver = true;
+                    break;
             }
-            if(gameOver) break;
+            if(gameOver) {
+                exitMenu();
+                break;
+            }
             
-            exitMenu();
+            
 
         }
 
